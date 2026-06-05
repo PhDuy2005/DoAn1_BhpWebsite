@@ -1,0 +1,16 @@
+**/.git
+**/.github
+**/.gradle
+**/.gradle-user-home*
+**/.idea
+**/.vscode
+**/build
+**/bin
+**/venv
+**/__pycache__
+**/*.pyc
+**/.env
+**/logs
+**/outputs
+data_*.pdf
+data_*.xlsx

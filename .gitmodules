@@ -1,0 +1,12 @@
+[submodule "ManagementService"]
+	path = ManagementService
+	url = https://github.com/PhDuy2005/ManagementService_BhpWebbsite.git
+[submodule "ExamService/ExamService"]
+	path = ExamService/ExamService
+	url = https://github.com/PhDuy2005/ExamService.git
+[submodule "ScoringService"]
+	path = ScoringService
+	url = https://github.com/PhDuy2005/BhpWebsite_ScoringService.git
+[submodule "APIGateway/ApiGateway"]
+	path = APIGateway/ApiGateway
+	url = https://github.com/PhDuy2005/BhpWebsite_ApiGateway.git

@@ -1,0 +1,27 @@
+﻿syntax = "proto3";
+
+package management.v1;
+
+service StudentResolverService {
+  rpc ResolveStudents(ResolveStudentsRequest) returns (ResolveStudentsResponse);
+}
+
+message ResolveStudentsRequest {
+  string school_year = 1;
+
+  // Student code from ExamService OMR flow. In ManagementService DB, this is studentId.
+  repeated string student_ids = 2;
+}
+
+message ResolveStudentsResponse {
+  repeated ResolvedStudent students = 1;
+  repeated string unresolved_student_ids = 2;
+}
+
+message ResolvedStudent {
+  string user_uuid = 1;
+  string student_id = 2;
+  string fullname = 3;
+}
+
+

@@ -1,0 +1,118 @@
+name: doan1
+
+services:
+  management-db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: da1
+      MYSQL_ROOT_PASSWORD: ${MANAGEMENT_DB_ROOT_PASSWORD:-123456}
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - management-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  exam-db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: exam_service
+      MYSQL_ROOT_PASSWORD: ${EXAM_DB_ROOT_PASSWORD:-123456}
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - exam-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p$${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  management-service:
+    build:
+      context: .
+      dockerfile: ManagementService/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      management-db:
+        condition: service_healthy
+    environment:
+      SERVER_PORT: 8081
+      GRPC_SERVER_PORT: 9092
+      SPRING_DATASOURCE_URL: "jdbc:mysql://management-db:3306/da1?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Ho_Chi_Minh"
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MANAGEMENT_DB_ROOT_PASSWORD:-123456}
+      JWT_SECRET: ${JWT_SECRET:-noVGO4KXfRQijWLkkHTdwMZzJcsvohOLNTzXHkWOEOwwj50/QWunAGce8b6XKqUwss6ozCb5A/e++2SPZN/d2Q==}
+    ports:
+      - "8081:8081"
+      - "9092:9092"
+
+  scoring-service:
+    build:
+      context: .
+      dockerfile: ScoringService/Dockerfile
+    restart: unless-stopped
+    environment:
+      GRPC_HOST: 0.0.0.0
+      GRPC_PORT: 50051
+      EXAMSERVICE_STORAGE_ROOT_PATH: /data/exam-service
+    volumes:
+      - exam-storage:/data/exam-service
+    ports:
+      - "50051:50051"
+
+  exam-service:
+    build:
+      context: .
+      dockerfile: ExamService/ExamService/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      exam-db:
+        condition: service_healthy
+      management-service:
+        condition: service_started
+      scoring-service:
+        condition: service_started
+    environment:
+      EXAMSERVICE_SERVER_PORT: 8080
+      EXAMSERVICE_DB_URL: "jdbc:mysql://exam-db:3306/exam_service?createDatabaseIfNotExist=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Ho_Chi_Minh"
+      EXAMSERVICE_DB_USERNAME: root
+      EXAMSERVICE_DB_PASSWORD: ${EXAM_DB_ROOT_PASSWORD:-123456}
+      EXAMSERVICE_JWT_BASE64_SECRET: ${JWT_SECRET:-noVGO4KXfRQijWLkkHTdwMZzJcsvohOLNTzXHkWOEOwwj50/QWunAGce8b6XKqUwss6ozCb5A/e++2SPZN/d2Q==}
+      EXAMSERVICE_STORAGE_ROOT_PATH: /data/exam-service
+      EXAMSERVICE_EXAM_PAPER_FONT_PATH: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
+      EXAMSERVICE_SCORING_SERVICE_HOST: scoring-service
+      EXAMSERVICE_SCORING_SERVICE_PORT: 50051
+      EXAMSERVICE_MANAGEMENT_SERVICE_HOST: management-service
+      EXAMSERVICE_MANAGEMENT_SERVICE_PORT: 9092
+    volumes:
+      - exam-storage:/data/exam-service
+    ports:
+      - "8080:8080"
+
+  api-gateway:
+    build:
+      context: .
+      dockerfile: APIGateway/ApiGateway/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      management-service:
+        condition: service_started
+      exam-service:
+        condition: service_started
+    environment:
+      MANAGEMENT_SERVICE_URI: http://management-service:8081
+      EXAM_SERVICE_URI: http://exam-service:8080
+      APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
+    ports:
+      - "8084:8084"
+
+volumes:
+  management-db-data:
+  exam-db-data:
+  exam-storage:
