@@ -10,3 +10,7 @@
 [submodule "APIGateway/ApiGateway"]
 	path = APIGateway/ApiGateway
 	url = https://github.com/PhDuy2005/BhpWebsite_ApiGateway.git
+[submodule "Project_1"]
+	path = Project_1
+	url = https://github.com/TuantdUIT/Project_1
+	branch = APIGateway_implement

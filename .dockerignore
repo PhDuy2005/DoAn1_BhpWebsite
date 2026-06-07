@@ -4,12 +4,17 @@
 **/.gradle-user-home*
 **/.idea
 **/.vscode
+**/.agent
 **/build
 **/bin
+**/dist
+**/node_modules
 **/venv
 **/__pycache__
 **/*.pyc
 **/.env
+**/.env.local
+**/.env.*.local
 **/logs
 **/outputs
 data_*.pdf

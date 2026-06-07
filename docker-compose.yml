@@ -112,6 +112,20 @@ services:
     ports:
       - "8084:8084"
 
+  frontend:
+    build:
+      context: ./Project_1
+      dockerfile: dockerfile
+      args:
+        VITE_APP_API_URL_MS: ${FRONTEND_API_URL_MS:-http://localhost:8084}
+        VITE_APP_API_URL_ES: ${FRONTEND_API_URL_ES:-http://localhost:8084}
+    restart: unless-stopped
+    depends_on:
+      api-gateway:
+        condition: service_started
+    ports:
+      - "3000:3000"
+
 volumes:
   management-db-data:
   exam-db-data:
