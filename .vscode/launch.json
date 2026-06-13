@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-ManagementServiceApplication<ManagementService>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.DoAn1.ManagementService.ManagementServiceApplication",
+            "projectName": "ManagementService",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
