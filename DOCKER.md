@@ -29,15 +29,10 @@ Open the services from the host:
 
 ## Configuration
 
-Optional `.env` values for Docker Compose:
+Docker Compose reads the root `.env` file automatically. Start from `.env.example` if you need a clean template:
 
-```env
-MANAGEMENT_DB_ROOT_PASSWORD=123456
-EXAM_DB_ROOT_PASSWORD=123456
-JWT_SECRET=noVGO4KXfRQijWLkkHTdwMZzJcsvohOLNTzXHkWOEOwwj50/QWunAGce8b6XKqUwss6ozCb5A/e++2SPZN/d2Q==
-APP_CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
-FRONTEND_API_URL_MS=http://localhost:8084
-FRONTEND_API_URL_ES=http://localhost:8084
+```powershell
+Copy-Item .env.example .env
 ```
 
 The compose file creates two separate MySQL containers:
