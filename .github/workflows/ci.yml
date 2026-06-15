@@ -70,20 +70,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: false
-
-      - name: Configure private submodule token
-        env:
-          CI_REPO_TOKEN: ${{ secrets.CI_REPO_TOKEN }}
-        run: |
-          if [ -n "$CI_REPO_TOKEN" ]; then
-            git config --global url."https://x-access-token:${CI_REPO_TOKEN}@github.com/".insteadOf "https://github.com/"
-          fi
-
-      - name: Checkout service submodule
-        run: |
-          git submodule sync -- "${{ matrix.path }}"
-          git submodule update --init --depth 1 -- "${{ matrix.path }}"
+          submodules: recursive
+          token: ${{ secrets.CI_REPO_TOKEN || github.token }}
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -133,20 +121,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: false
-
-      - name: Configure private submodule token
-        env:
-          CI_REPO_TOKEN: ${{ secrets.CI_REPO_TOKEN }}
-        run: |
-          if [ -n "$CI_REPO_TOKEN" ]; then
-            git config --global url."https://x-access-token:${CI_REPO_TOKEN}@github.com/".insteadOf "https://github.com/"
-          fi
-
-      - name: Checkout ScoringService submodule
-        run: |
-          git submodule sync -- ScoringService
-          git submodule update --init --depth 1 -- ScoringService
+          submodules: recursive
+          token: ${{ secrets.CI_REPO_TOKEN || github.token }}
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -204,20 +180,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: false
-
-      - name: Configure private submodule token
-        env:
-          CI_REPO_TOKEN: ${{ secrets.CI_REPO_TOKEN }}
-        run: |
-          if [ -n "$CI_REPO_TOKEN" ]; then
-            git config --global url."https://x-access-token:${CI_REPO_TOKEN}@github.com/".insteadOf "https://github.com/"
-          fi
-
-      - name: Checkout frontend submodule
-        run: |
-          git submodule sync -- Project_1
-          git submodule update --init --depth 1 -- Project_1
+          submodules: recursive
+          token: ${{ secrets.CI_REPO_TOKEN || github.token }}
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -251,42 +215,25 @@ jobs:
           - image: management-service
             context: .
             dockerfile: ManagementService/Dockerfile
-            submodule: ManagementService
           - image: exam-service
             context: .
             dockerfile: ExamService/ExamService/Dockerfile
-            submodule: ExamService/ExamService
           - image: scoring-service
             context: .
             dockerfile: ScoringService/Dockerfile
-            submodule: ScoringService
           - image: api-gateway
             context: .
             dockerfile: APIGateway/ApiGateway/Dockerfile
-            submodule: APIGateway/ApiGateway
           - image: frontend
             context: Project_1
             dockerfile: Project_1/dockerfile
-            submodule: Project_1
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          submodules: false
-
-      - name: Configure private submodule token
-        env:
-          CI_REPO_TOKEN: ${{ secrets.CI_REPO_TOKEN }}
-        run: |
-          if [ -n "$CI_REPO_TOKEN" ]; then
-            git config --global url."https://x-access-token:${CI_REPO_TOKEN}@github.com/".insteadOf "https://github.com/"
-          fi
-
-      - name: Checkout image submodule
-        run: |
-          git submodule sync -- "${{ matrix.submodule }}"
-          git submodule update --init --depth 1 -- "${{ matrix.submodule }}"
+          submodules: recursive
+          token: ${{ secrets.CI_REPO_TOKEN || github.token }}
 
       - name: Build Docker image
         run: docker build -f ${{ matrix.dockerfile }} -t doan1-${{ matrix.image }}:${{ github.sha }} ${{ matrix.context }}
